@@ -94,8 +94,9 @@
          */
         protected function verifyOtp(Request $request){
                 $savedCode = Auth::user()->email_verified_at;
-                if($savedCode === $request->code)
-                return true;
+                if($savedCode === $request->code){
+                       return response()->json( $this->getAuthenticatedUser(), 200); //get user
+                }
                 return response()->json(['message'=> 'Invalid OTP Provided'], 500);
         }
 

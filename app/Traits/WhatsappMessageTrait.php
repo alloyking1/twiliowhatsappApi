@@ -32,4 +32,5 @@
         public function generateCode(){
             return mt_rand();
         }
+
     }
