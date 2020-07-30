@@ -8,6 +8,7 @@
     use Illuminate\Support\Facades\Hash;
     use Illuminate\Support\Facades\Validator;
     use JWTAuth;
+    use Auth;
     use Tymon\JWTAuth\Exceptions\JWTException;
 
     class UserController extends Controller
@@ -19,14 +20,14 @@
             $credentials = $request->only('email', 'password');
 
             try{
-                //login
                 if (! $token = JWTAuth::attempt($credentials)) {
                         return response()->json(['error' => 'invalid_credentials'], 400);
                 } 
 
                 try{
-                        $this->saveOtpCode($this->generateCode());
-                        $this->sendOtp("+2348063146940");
+                        $code = $this->generateCode();
+                        $this->saveOtpCode($code);
+                        $this->sendOtp("+2348063146940", $code);
                 }catch(JWTException $e){
                         return response()->json(['error sending opt', 500]);
                 }
@@ -91,7 +92,7 @@
          * @params $incomingCode $email
          * @return true || error
          */
-        protected function verfifyOtp(Request $request){
+        protected function verifyOtp(Request $request){
                 $savedCode = Auth::user()->email_verified_at;
                 if($savedCode === $request->code)
                 return true;
@@ -105,7 +106,7 @@
          */
         protected function  saveOtpCode($code){
                 $user = Auth::user();
-                $user->email_verified_at = $code;
+                $user->otp = $code;
                 $user->save();
         }
 

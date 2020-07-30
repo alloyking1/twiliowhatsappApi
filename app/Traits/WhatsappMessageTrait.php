@@ -11,14 +11,21 @@
          * @param null
          * @request null
          */
-        public function sendOtp($recipient){
-            $twilio_whatsapp_number = getenv('TWILIO_WHATSAPP_NUMBER');
-            $account_sid = getenv("TWILIO_SID");
-            $auth_token = getenv("TWILIO_AUTH_TOKEN");
-            $message = "This is your 2FA verification code ".$this->generateCode();
+        public function sendOtp($recipient, $code){
 
-            $client = new Client($account_sid, $auth_token);
-            return $client->messages->create($recipient, array('from' => "whatsapp:$twilio_whatsapp_number", 'body' => $message));
+            $sid    = getenv("TWILIO_SID"); 
+            
+            $token  = getenv("TWILIO_AUTH_TOKEN"); 
+            $twilio = new Client($sid, $token); 
+            $from = getenv("TWILIO_WHATSAPP_NUMBER");
+            
+            $message = $twilio->messages 
+                ->create("whatsapp:".$recipient, // to 
+                    array( 
+                        "from" => "whatsapp:".$from,       
+                        "body" => "Your OTP verification code  is ". $code 
+                    ) 
+                ); 
 
         }
 
