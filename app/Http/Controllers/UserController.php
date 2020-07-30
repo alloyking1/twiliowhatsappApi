@@ -19,20 +19,20 @@
             $credentials = $request->only('email', 'password');
 
             try{
-                
-                if($this->sendOtp("+2348063146940")){
-                        try {
-                                if (! $token = JWTAuth::attempt($credentials)) {
-                                        return response()->json(['error' => 'invalid_credentials'], 400);
-                                }
-                        } catch (JWTException $e) {
-                                return response()->json(['error' => 'could_not_create_token'], 500);
-                        }
+                //login
+                if (! $token = JWTAuth::attempt($credentials)) {
+                        return response()->json(['error' => 'invalid_credentials'], 400);
+                } 
 
-                        return response()->json(compact('token'));
+                try{
+                        $this->saveOtpCode($this->generateCode());
+                        $this->sendOtp("+2348063146940");
+                }catch(JWTException $e){
+                        return response()->json(['error sending opt', 500]);
                 }
             }catch (JWTException $e){
-                return response()->json(['error sending opt', 500]);
+                
+                return response()->json(['error' => 'could_not_create_token'], 500);
             }
 
             return response()->json(compact('token'));
@@ -86,14 +86,27 @@
                 return response()->json(compact('user'));
         }
 
-        protected function VerfifyOtp($incomingCode, $email){
-                $user = User::where('email', $mail)->get();
-                $dbCode = $user->code;
-                if($incomingCode === $dbCode){
-                        return true;
-                }else{
-                        return response()->json(['message'=> 'Invalid OTP Provided'], 500);
-                }
-        } 
+        /**
+         * Verifies the OTP code 
+         * @params $incomingCode $email
+         * @return true || error
+         */
+        protected function verfifyOtp(Request $request){
+                $savedCode = Auth::user()->email_verified_at;
+                if($savedCode === $request->code)
+                return true;
+                return response()->json(['message'=> 'Invalid OTP Provided'], 500);
+        }
+
+        /**
+         * save OTP code in database 
+         * @params $incomingCode $email
+         * @return true || error
+         */
+        protected function  saveOtpCode($code){
+                $user = Auth::user();
+                $user->email_verified_at = $code;
+                $user->save();
+        }
 
     }
