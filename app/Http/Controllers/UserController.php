@@ -36,7 +36,8 @@
                 return response()->json(['error' => 'could_not_create_token'], 500);
             }
 
-            return response()->json(compact('token'));
+        //     return response()->json(compact('token'));
+            return response()->json(["message"=>"OTP sent to whatsapp successfully, verfity to continue", "token" => $token], 200);
         }
 
         public function register(Request $request)
@@ -93,7 +94,7 @@
          * @return true || error
          */
         protected function verifyOtp(Request $request, $email){
-                $savedCode = User::where('email', 'alloyking1@gmail.com')->first();
+                $savedCode = User::where('email', $request->email)->first();
                 if($savedCode->otp === $request->code){
 
                        //todo get authenticated user here 
