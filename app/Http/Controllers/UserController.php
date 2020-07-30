@@ -92,10 +92,12 @@
          * @params $incomingCode $email
          * @return true || error
          */
-        protected function verifyOtp(Request $request){
-                $savedCode = Auth::user()->email_verified_at;
-                if($savedCode === $request->code){
-                       return response()->json( $this->getAuthenticatedUser(), 200); //get user
+        protected function verifyOtp(Request $request, $email){
+                $savedCode = User::where('email', 'alloyking1@gmail.com')->first();
+                if($savedCode->otp === $request->code){
+
+                       //todo get authenticated user here 
+                       return response()->json("Account Verified", 200); 
                 }
                 return response()->json(['message'=> 'Invalid OTP Provided'], 500);
         }

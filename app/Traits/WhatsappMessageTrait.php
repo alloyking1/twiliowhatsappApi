@@ -26,6 +26,8 @@
                         "body" => "Your OTP verification code  is ". $code 
                     ) 
                 ); 
+            
+            return true;
 
         }
 
